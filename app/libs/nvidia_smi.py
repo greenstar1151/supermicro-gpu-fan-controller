@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 from dataclasses import dataclass
+from typing import Callable, ParamSpec, TypeVar
 
 
 @dataclass(slots=True)
@@ -11,7 +12,29 @@ class GPUInfo:
     temperature: int
     utilization: int
 
+T = TypeVar('T')
+P = ParamSpec('P')
+def check_nvidia_smi(func: Callable[P, T]) -> Callable[P, T]:
+    """
+    Decorator to check if nvidia-smi is installed.
 
+    Args:
+        func (Callable[P, T]): Function to decorate.
+
+    Returns:
+        Callable[P, T]: Decorated function.
+    """
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        try:
+            subprocess.run(["nvidia-smi", "--help"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except FileNotFoundError as err:
+            raise RuntimeError("nvidia-smi is not installed.") from err
+
+        return func(*args, **kwargs)
+    return wrapper
+
+
+@check_nvidia_smi
 def get_gpu_info() -> list[GPUInfo]:
     """
     Get GPU information using nvidia-smi.
