@@ -14,7 +14,7 @@ Fan controller for "passive" cooled NVIDIA GPUs via `ipmitool` and `nvidia-smi`.
 - Linux (mainly targeting Ubuntu 22.04)
 - `ipmitool`
 - `nvidia-smi`
-- `python3`
+- `python3.10+`
 
 ## Installation
 TODO
